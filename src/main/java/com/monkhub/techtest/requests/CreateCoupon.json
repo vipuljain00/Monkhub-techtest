@@ -1,0 +1,13 @@
+{
+  "title": "Holiday Special",
+  "couponCode": "HOLIDAY2025",
+  "discountType": "PERCENTAGE",
+  "discountValue": 15.0,
+  "expiryDate": "2025-12-31",
+  "customerScope": "all",
+  "customerIds": [],
+  "minimumDiscount": 50.0,
+  "maximumDiscount": 200.0,
+  "usagePerCustomer": "FIXED",
+  "usageLimit": 3
+}

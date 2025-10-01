@@ -1,0 +1,45 @@
+# Maven target directory
+/target/
+
+# Compiled class files
+*.class
+
+# Log files
+*.log
+
+# Eclipse project files
+.project
+.classpath
+.settings/
+
+# IntelliJ IDEA project files
+.idea/
+*.iml
+*.iws
+out/
+
+# VS Code settings
+.vscode/
+
+# Mac system files
+.DS_Store
+
+# Windows system files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Maven Wrapper files
+.mvn/wrapper/maven-wrapper.jar
+
+# Spring Boot specific
+spring.log
+spring.log.*
+
+# Others
+*.swp
+*~
+*.tmp
+*.bak
+*.orig
+*.rej
