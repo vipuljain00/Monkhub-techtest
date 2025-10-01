@@ -7,9 +7,11 @@ import com.monkhub.techtest.repository.CustomerRepository;
 import com.monkhub.techtest.repository.DiscountCouponRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.AllArgsConstructor;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -26,55 +28,32 @@ public class CustomerService {
     private final DiscountCouponRepository discountCouponRepository;
 
     public CustomerDTO createCustomer(CustomerDTO customerDTO) {
+        customerDTO.getCoupons().clear();
         Customer customer = mapToEntity(customerDTO);
         Customer savedCustomer = customerRepository.save(customer);
         return mapToDTO(savedCustomer);
     }
+
 
     public List<CustomerDTO> getAllCustomers() {
         List<Customer> customers = customerRepository.findAll();
         return customers.stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
-    public CustomerDTO getCustomerById(Long id) {
-        Customer customer = customerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Customer not found with id: " + id));
-        return mapToDTO(customer);
-    }
 
-    public CustomerDTO updateCustomer(Long id, CustomerDTO customerDTO) {
-        Optional<Customer> optionalExistingCustomer = customerRepository.findById(id);
-        if (optionalExistingCustomer.isEmpty()) {
-            throw new RuntimeException("Customer not found with id: " + id);
-        }
-        Customer customer = optionalExistingCustomer.get();
-        customer.setName(customerDTO.getName());
-        customer.setEmail(customerDTO.getEmail());
-        customer.setMobile(customerDTO.getMobile());
-
-        Customer updatedCustomer = customerRepository.save(customer);
-        return mapToDTO(updatedCustomer);
-    }
-
-    public void deleteCustomer(Long id) {
-        if (!customerRepository.existsById(id)) {
-            throw new RuntimeException("Customer not found with id: " + id);
-        }
-        customerRepository.deleteById(id);
-    }
 
     private CustomerDTO mapToDTO(Customer customer) {
-        Set<Long> couponIds = null;
+        Set<DiscountCoupon> coupons = new HashSet<>();
         if (customer.getCoupons() != null) {
-            couponIds = customer.getCoupons().stream()
-                    .map(DiscountCoupon::getId)
-                    .collect(Collectors.toSet());
+            coupons = new HashSet<>(customer.getCoupons());
+            coupons.stream()
+                    .forEach(coupon -> coupon.getApplicableCustomers().clear());
         }
         return CustomerDTO.builder()
                 .name(customer.getName())
                 .email(customer.getEmail())
                 .mobile(customer.getMobile())
-                .couponIds(couponIds)
+                .coupons(coupons)
                 .build();
     }
 
@@ -84,7 +63,6 @@ public class CustomerService {
                 .name(customerDTO.getName())
                 .email(customerDTO.getEmail())
                 .mobile(customerDTO.getMobile())
-                .coupons(null)
                 .build();
     }
 }

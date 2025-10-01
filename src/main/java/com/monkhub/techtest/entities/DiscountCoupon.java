@@ -5,11 +5,14 @@ import com.monkhub.techtest.enums.UsageLimit;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
 @Table(name = "discount_coupon")
 @Data
+@ToString(exclude = "applicableCustomers")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -40,9 +43,9 @@ public class DiscountCoupon {
 
     @ManyToMany
     @JoinTable(
-        name = "customer_discount_coupon",
-        joinColumns = @JoinColumn(name = "discount_coupon_id"),
-        inverseJoinColumns = @JoinColumn(name = "customer_id")
+            name = "customer_discount_coupon",
+            joinColumns = @JoinColumn(name = "discount_coupon_id"),
+            inverseJoinColumns = @JoinColumn(name = "customer_id")
     )
     private Set<Customer> applicableCustomers;
 
@@ -55,4 +58,17 @@ public class DiscountCoupon {
     private UsageLimit usagePerCustomer; // 'Unlimited' or fixed number as string
 
     private Integer usageLimit; // in case fixed number is needed
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DiscountCoupon that = (DiscountCoupon) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }

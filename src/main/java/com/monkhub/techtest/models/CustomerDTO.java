@@ -1,10 +1,13 @@
 package com.monkhub.techtest.models;
 
+import com.monkhub.techtest.entities.DiscountCoupon;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -27,5 +30,5 @@ public class CustomerDTO {
     private String mobile;
 
     @Builder.Default
-    private Set<Long> couponIds = null;
+    private Set<DiscountCoupon> coupons = new HashSet<>();
 }

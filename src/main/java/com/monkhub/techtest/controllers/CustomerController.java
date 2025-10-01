@@ -21,8 +21,6 @@ public class CustomerController {
 
     @PostMapping
     public ResponseEntity<CustomerDTO> createCustomer(@RequestBody @Valid CustomerDTO customerDTO) {
-        // Ensure couponIds is not set during creation
-        customerDTO.setCouponIds(null);
         CustomerDTO customer = customerService.createCustomer(customerDTO);
         return new ResponseEntity<>(customer, HttpStatus.CREATED);
     }

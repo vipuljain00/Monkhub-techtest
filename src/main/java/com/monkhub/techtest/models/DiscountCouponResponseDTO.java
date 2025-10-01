@@ -14,7 +14,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class DiscountCouponDTO {
+public class DiscountCouponResponseDTO {
 
     @NotBlank(message = "Title must not be blank")
     @Size(max = 100, message = "Title must be at most 100 characters")
@@ -41,7 +41,7 @@ public class DiscountCouponDTO {
     private String customerScope;
 
     @Builder.Default
-    private Set<Long> customerIds = new HashSet<>();
+    private Set<Customer> customers = new HashSet<>();
 
     @DecimalMin(value = "0.0", message = "Minimum discount cannot be negative")
     private Double minimumDiscount;

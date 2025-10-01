@@ -1,9 +1,7 @@
 package com.monkhub.techtest.controllers;
 
-import com.monkhub.techtest.entities.DiscountCoupon;
-import com.monkhub.techtest.enums.DiscountType;
-import com.monkhub.techtest.enums.UsageLimit;
 import com.monkhub.techtest.models.DiscountCouponDTO;
+import com.monkhub.techtest.models.DiscountCouponResponseDTO;
 import com.monkhub.techtest.service.DiscountCouponService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -23,26 +21,26 @@ public class DiscountCouponController {
     private final DiscountCouponService discountCouponService;
 
     @PostMapping
-    public ResponseEntity<DiscountCouponDTO> createCoupon(@RequestBody @Valid DiscountCouponDTO couponDto) {
-        DiscountCouponDTO createdCoupon = discountCouponService.createCoupon(couponDto);
+    public ResponseEntity<DiscountCouponResponseDTO> createCoupon(@RequestBody @Valid DiscountCouponDTO couponDto) {
+        DiscountCouponResponseDTO createdCoupon = discountCouponService.createCoupon(couponDto);
         return new ResponseEntity<>(createdCoupon, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<DiscountCouponDTO>> getAllCoupons() {
-        List<DiscountCouponDTO> coupons = discountCouponService.getAllCoupons();
+    public ResponseEntity<List<DiscountCouponResponseDTO>> getAllCoupons() {
+        List<DiscountCouponResponseDTO> coupons = discountCouponService.getAllCoupons();
         return new ResponseEntity<>(coupons, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DiscountCouponDTO> getCouponById(@PathVariable Long id) {
-        DiscountCouponDTO coupon = discountCouponService.getCouponById(id);
+    public ResponseEntity<DiscountCouponResponseDTO> getCouponById(@PathVariable Long id) {
+        DiscountCouponResponseDTO coupon = discountCouponService.getCouponById(id);
         return new ResponseEntity<>(coupon, HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<DiscountCouponDTO> updateCoupon(@PathVariable Long id, @RequestBody @Valid DiscountCouponDTO couponDto) {
-        DiscountCouponDTO updatedCoupon = discountCouponService.updateCoupon(id, couponDto);
+    public ResponseEntity<DiscountCouponResponseDTO> updateCoupon(@PathVariable Long id, @RequestBody @Valid DiscountCouponDTO couponDto) {
+        DiscountCouponResponseDTO updatedCoupon = discountCouponService.updateCoupon(id, couponDto);
         return new ResponseEntity<>(updatedCoupon, HttpStatus.OK);
     }
 

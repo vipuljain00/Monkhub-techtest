@@ -3,6 +3,7 @@ package com.monkhub.techtest.service;
 import com.monkhub.techtest.entities.DiscountCoupon;
 import com.monkhub.techtest.entities.Customer;
 import com.monkhub.techtest.models.DiscountCouponDTO;
+import com.monkhub.techtest.models.DiscountCouponResponseDTO;
 import com.monkhub.techtest.repository.DiscountCouponRepository;
 import com.monkhub.techtest.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.AllArgsConstructor;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -26,52 +28,54 @@ public class DiscountCouponService {
     @Autowired
     private final CustomerRepository customerRepository;
 
-    public DiscountCouponDTO createCoupon(DiscountCouponDTO couponDTO) {
+    public DiscountCouponResponseDTO createCoupon(DiscountCouponDTO couponDTO) {
         DiscountCoupon coupon = mapToEntity(couponDTO);
         DiscountCoupon savedCoupon = discountCouponRepository.save(coupon);
         return mapToDTO(savedCoupon);
     }
 
-    @Transactional(readOnly = true)
-    public List<DiscountCouponDTO> getAllCoupons() {
-        List<DiscountCoupon> coupons = discountCouponRepository.findAllWithCustomers();
+    public List<DiscountCouponResponseDTO> getAllCoupons() {
+        List<DiscountCoupon> coupons = discountCouponRepository.findAll();
         return coupons.stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true)
-    public DiscountCouponDTO getCouponById(Long id) {
-        DiscountCoupon coupon = discountCouponRepository.findByIdWithCustomers(id)
+    public DiscountCouponResponseDTO getCouponById(Long id) {
+        DiscountCoupon coupon = discountCouponRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Discount coupon not found with id: " + id));
         return mapToDTO(coupon);
     }
 
-    public DiscountCouponDTO updateCoupon(Long id, DiscountCouponDTO couponDTO) {
+    public DiscountCouponResponseDTO updateCoupon(Long id, DiscountCouponDTO couponDTO) {
         Optional<DiscountCoupon> optionalExistingCoupon = discountCouponRepository.findById(id);
         if (optionalExistingCoupon.isEmpty()) {
             throw new RuntimeException("Discount coupon not found with id: " + id);
         }
         DiscountCoupon coupon = optionalExistingCoupon.get();
+
+        // Update customers if provided and scope is selected
+        Set<Customer> customers = new HashSet<>();
+        if("selected".equalsIgnoreCase(couponDTO.getCustomerScope()) && !couponDTO.getCustomerIds().isEmpty()){
+            customers = couponDTO.getCustomerIds().stream()
+                    .map(customerId -> customerRepository.findById(customerId)
+                        .orElseThrow(() -> new RuntimeException("Customer not found with id: " + customerId)))
+                    .collect(Collectors.toSet());
+        } else if ("all".equalsIgnoreCase(couponDTO.getCustomerScope())) {
+            customers = null;
+        }
+
+
         coupon.setTitle(couponDTO.getTitle());
         coupon.setCouponCode(couponDTO.getCouponCode());
         coupon.setDiscountType(Enum.valueOf(com.monkhub.techtest.enums.DiscountType.class, couponDTO.getDiscountType()));
         coupon.setDiscountValue(couponDTO.getDiscountValue());
         coupon.setExpiryDate(couponDTO.getExpiryDate());
         coupon.setCustomerScope(couponDTO.getCustomerScope());
+        coupon.setApplicableCustomers(customers);
         coupon.setMinimumDiscount(couponDTO.getMinimumDiscount());
         coupon.setMaximumDiscount(couponDTO.getMaximumDiscount());
         coupon.setUsagePerCustomer(Enum.valueOf(com.monkhub.techtest.enums.UsageLimit.class, couponDTO.getUsagePerCustomer()));
         coupon.setUsageLimit(couponDTO.getUsageLimit());
 
-        // Update customers if provided and scope is selected
-        if ("selected".equalsIgnoreCase(couponDTO.getCustomerScope()) && couponDTO.getCustomerIds() != null) {
-            Set<Customer> customers = couponDTO.getCustomerIds().stream()
-                    .map(customerId -> customerRepository.findById(customerId)
-                            .orElseThrow(() -> new RuntimeException("Customer not found with id: " + customerId)))
-                    .collect(Collectors.toSet());
-            coupon.setApplicableCustomers(customers);
-        } else if ("all".equalsIgnoreCase(couponDTO.getCustomerScope())) {
-            coupon.setApplicableCustomers(null);
-        }
 
         DiscountCoupon updatedCoupon = discountCouponRepository.save(coupon);
         return mapToDTO(updatedCoupon);
@@ -84,22 +88,23 @@ public class DiscountCouponService {
         discountCouponRepository.deleteById(id);
     }
 
-    private DiscountCouponDTO mapToDTO(DiscountCoupon coupon) {
-        Set<Long> customerIds = null;
-        if ("selected".equalsIgnoreCase(coupon.getCustomerScope()) && coupon.getApplicableCustomers() != null) {
-            System.out.println("Applicable Customers: " + coupon.getApplicableCustomers());
-            customerIds = coupon.getApplicableCustomers().stream()
-                    .map(Customer::getId)
-                    .collect(Collectors.toSet());
+    private DiscountCouponResponseDTO mapToDTO(DiscountCoupon coupon) {
+        Set<Customer> customers = new HashSet<>();
+        if ("selected".equalsIgnoreCase(coupon.getCustomerScope()) && !coupon.getApplicableCustomers().isEmpty()) {
+            customers = new HashSet<>(coupon.getApplicableCustomers());
+            customers.stream()
+                    .forEach(customer -> customer.getCoupons().clear());
+        } else if ("all".equalsIgnoreCase(coupon.getCustomerScope())) {
+            customers = null;
         }
-        return DiscountCouponDTO.builder()
+        return DiscountCouponResponseDTO.builder()
                 .title(coupon.getTitle())
                 .couponCode(coupon.getCouponCode())
                 .discountType(coupon.getDiscountType().name())
                 .discountValue(coupon.getDiscountValue())
                 .expiryDate(coupon.getExpiryDate())
                 .customerScope(coupon.getCustomerScope())
-                .customerIds(customerIds)
+                .customers(customers)
                 .minimumDiscount(coupon.getMinimumDiscount())
                 .maximumDiscount(coupon.getMaximumDiscount())
                 .usagePerCustomer(coupon.getUsagePerCustomer().name())
@@ -108,12 +113,15 @@ public class DiscountCouponService {
     }
 
     private DiscountCoupon mapToEntity(DiscountCouponDTO couponDTO) {
-        Set<Customer> customers = null;
-        if ("selected".equalsIgnoreCase(couponDTO.getCustomerScope()) && couponDTO.getCustomerIds() != null) {
+        Set<Customer> customers = new HashSet<>();
+        if ("selected".equalsIgnoreCase(couponDTO.getCustomerScope()) && !couponDTO.getCustomerIds().isEmpty()) {
             customers = couponDTO.getCustomerIds().stream()
                     .map(customerId -> customerRepository.findById(customerId)
                             .orElseThrow(() -> new RuntimeException("Customer not found with id: " + customerId)))
                     .collect(Collectors.toSet());
+
+        } else if ("all".equalsIgnoreCase(couponDTO.getCustomerScope())) {
+            customers = null;
         }
         return DiscountCoupon.builder()
                 .title(couponDTO.getTitle())

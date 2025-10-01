@@ -1,13 +1,32 @@
-{
-  "title": "Holiday Special",
-  "couponCode": "HOLIDAY2025",
-  "discountType": "PERCENTAGE",
-  "discountValue": 15.0,
-  "expiryDate": "2025-12-31",
-  "customerScope": "all",
-  "customerIds": [],
-  "minimumDiscount": 50.0,
-  "maximumDiscount": 200.0,
-  "usagePerCustomer": "FIXED",
-  "usageLimit": 3
-}
+  {
+    "title": "Holiday Special",
+    "couponCode": "HOLIDAY2025",
+    "discountType": "PERCENTAGE",
+    "discountValue": 15.0,
+    "expiryDate": "2025-12-31",
+    "customerScope": "all",
+    "customerIds": [],
+    "minimumDiscount": 50.0,
+    "maximumDiscount": 200.0,
+    "usagePerCustomer": "FIXED",
+    "usageLimit": 3
+  }
+
+
+  or
+
+
+
+  {
+    "title": "Independence Day Special",
+    "couponCode": "INDEPENDENCE2025",
+    "discountType": "FIXED",
+    "discountValue": 50.0,
+    "expiryDate": "2025-12-31",
+    "customerScope": "selected",
+    "customerIds": [1, 4],
+    "minimumDiscount": 100.0,
+    "maximumDiscount": 2000.0,
+    "usagePerCustomer": "FIXED",
+    "usageLimit": 3
+  }
