@@ -3,12 +3,8 @@
 ### Customers
 
 - **GET /api/customers**: Retrieve all customers.
-- **GET /api/customers/{id}**: Retrieve a customer by ID.
 - **POST /api/customers**: Create a new customer.
-  - Request Body: JSON object with `name`, `email`, `mobile`.
-- **PUT /api/customers/{id}**: Update an existing customer.
-  - Request Body: JSON object with `name`, `email`, `mobile`.
-- **DELETE /api/customers/{id}**: Delete a customer by ID.
+
 
 ### Discount Coupons
 
