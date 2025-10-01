@@ -48,28 +48,7 @@
 
 ## Database
 
-The application uses an embedded H2 database. You can access the H2 console at `http://localhost:8080/h2-console` with the following credentials:
+The application uses mysql database.
 
-- JDBC URL: `jdbc:h2:mem:testdb`
-- Username: `sa`
-- Password: (leave blank)
 
-## Testing
 
-Run the tests using Maven:
-
-```bash
-mvn test
-```
-
-## Contributing
-
-1. Fork the repository.
-2. Create a feature branch.
-3. Commit your changes.
-4. Push to the branch.
-5. Create a Pull Request.
-
-## License
-
-This project is licensed under the MIT License.
